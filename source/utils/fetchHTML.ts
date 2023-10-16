@@ -17,10 +17,10 @@ export async function fetchHTML(url: string) {
 			headless: "new",
 		});
 
-		/** Visit the url */
+		/** Visit the url, provide fail-safe timeout */
 		const page = await browser.newPage();
 		console.log("\nStarted Fetching HTML for:\n", url);
-		await page.goto(url);
+		await page.goto(url, { waitUntil: "load", timeout: 30000 });
 
 		/** Get HTML content of the page */
 		const pageHTML: string = await page.evaluate(() => {
