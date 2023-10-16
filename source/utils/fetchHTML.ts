@@ -20,7 +20,7 @@ export async function fetchHTML(url: string) {
 		/** Visit the url, provide fail-safe timeout */
 		const page = await browser.newPage();
 		console.log("\nStarted Fetching HTML for:\n", url);
-		await page.goto(url, { waitUntil: "load", timeout: 30000 });
+		await page.goto(url, { waitUntil: "load", timeout: 60000 });
 
 		/** Get HTML content of the page */
 		const pageHTML: string = await page.evaluate(() => {

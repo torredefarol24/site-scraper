@@ -2,12 +2,15 @@ import { load } from "cheerio";
 import { NextFunction, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { RYANSParams } from "../../../config/platforms";
+import { exportToTSV } from "../../../utils/exportToTSV";
 
 export async function scrape(request: any, response: Response, next: NextFunction) {
 	try {
+		const { key, scraper, attrWOPrice } = RYANSParams;
+
 		/** Begin Scraping*/
 		const $ = load(request.scrapedHTML.ryans);
-		const $productsWrapper: any = $(RYANSParams.scrapeElements.productWrapper);
+		const $productsWrapper: any = $(scraper.productWrapper);
 		const $products: any = $($productsWrapper[0].children[0].children[0]);
 
 		let title: any = null,
@@ -33,8 +36,8 @@ export async function scrape(request: any, response: Response, next: NextFunctio
 
 				/** Parse valid product information */
 				const validTitle = title !== null && title.length > 0;
-				const validPrice = price !== null && price != RYANSParams.attrWOPrice;
-				// const validPrice = price !== null;
+				const validPrice = price !== null && price != attrWOPrice;
+
 				if (validTitle && validPrice) {
 					return {
 						title,
@@ -45,6 +48,8 @@ export async function scrape(request: any, response: Response, next: NextFunctio
 			.filter((product: any) => {
 				return product && product.title !== null && product.price !== null;
 			});
+
+		exportToTSV(products, key);
 
 		return response.status(StatusCodes.OK).json({
 			message: ReasonPhrases.OK,
